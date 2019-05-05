@@ -10,6 +10,19 @@ const app = express()
 app.use('/public/', express.static(path.join(__dirname,'./public/')))
 app.use('/node_modules/', express.static(path.join(__dirname,'./node_modules/')))
 
+//设置允许跨域访问该服务.
+app.all('*',function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
+  res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+
+  if (req.method == 'OPTIONS') {
+    res.send(200); /让options请求快速返回/
+  }
+  else {
+    next();
+  }
+});
 
 // 接受 解析客户端提交的 json 格式数据
 // 能解析 application/json
