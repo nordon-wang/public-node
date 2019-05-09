@@ -223,3 +223,46 @@ exports.userInfoCtrl = (req, res) => {
     })
 }
 
+// 获取文章详情
+exports.articleDetailCtrl = (req, res) => {
+    console.log('文章id',req.query.id);
+    
+    res.status(200).send({
+        data:{
+            art_id:req.query.id + 1,
+            title:'Adipisicing officia pariatur dolor eiusmod consequat reprehenderit fugiat nulla cillum aliqua.',
+            pubdate:'2019-05-05 22:10:00',
+            auth_id:req.query.id + 11,
+            auth_name:`王耀-${Math.floor(Math.random() * 1000)}号`,
+            auth_photo:'https://cdn.jsdelivr.net/gh/flutterchina/website@1.0/images/flutter-mark-square-100.png',
+            is_followed:true,
+            recomments:[
+                {
+                    title:`${Math.floor(Math.random() * 1000)} pms 威武雄壮 ~~~`,
+                    id:Math.floor(Math.random() * 1000)
+                },
+                {
+                    title:`${Math.floor(Math.random() * 1000)} pms 威武雄壮 ~~~`,
+                    id:Math.floor(Math.random() * 1000)
+                }, 
+                {
+                    title:`${Math.floor(Math.random() * 1000)} pms 威武雄壮 ~~~`,
+                    id:Math.floor(Math.random() * 1000)
+                }, 
+                {
+                    title:`${Math.floor(Math.random() * 1000)} pms 威武雄壮 ~~~`,
+                    id:Math.floor(Math.random() * 1000)
+                }, 
+                {
+                    title:`${Math.floor(Math.random() * 1000)} pms 威武雄壮 ~~~`,
+                    id:Math.floor(Math.random() * 1000)
+                }, 
+            ],
+            content:`Aliqua ea velit "occaecat" 'cillum' nostrud sit. Consectetur exercitation aliquip mollit nulla et nostrud ullamco aliqua ipsum occaecat deserunt exercitation. Est anim proident labore dolore commodo velit ex ea laboris excepteur id aliqua.
+          
+            Culpa irure cillum nulla fugiat dolor. Incididunt ipsum ipsum do eiusmod est non cupidatat aute commodo ex pariatur proident nisi. Labore et in veniam sint magna excepteur duis. Laborum consequat sit duis culpa amet eiusmod aliquip deserunt amet ut labore. Dolore consequat culpa ipsum anim do reprehenderit ullamco incididunt mollit ad duis. Consequat minim commodo Lorem qui qui ipsum occaecat.
+          
+            Laboris consequat sit nulla consectetur est dolor consequat in velit nisi. Dolore proident dolor voluptate sunt aliquip dolore tempor et mollit ad officia anim. Quis deserunt eu officia dolor. Lorem in sint voluptate cillum officia nulla duis eiusmod ad aliqua exercitation nulla eu.`
+        }
+    })
+}

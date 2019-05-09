@@ -13,6 +13,7 @@ router
   .get('/userChannels', indexCtrl.userChannelsCtrl)
   .get('/allChannels', indexCtrl.allChannelsCtrl)
   .get('/userInfo', indexCtrl.userInfoCtrl)
+  .get('/articleDetail', indexCtrl.articleDetailCtrl)
 
 
   module.exports = router
