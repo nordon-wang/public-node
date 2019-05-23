@@ -15,6 +15,7 @@ client.on('connect', () => {
 
   process.stdin.on('data', data => {
     const msg = data.toString().trim()
+
     // 不存在昵称
     if(!nickname){
       return client.write(JSON.stringify({
@@ -23,9 +24,22 @@ client.on('connect', () => {
       }))
     }
 
+    // 使用正则判断是否为私聊
+    const matches = /^@(\w+)\s(.+)$/.exec(msg)
+
+    if(matches){ // 符合 @xx xxx 格式， 是私聊
+      return client.write(JSON.stringify({
+        type:types.p2p,
+        to:matches[1],
+        from:nickname,
+        msg:matches[2]
+      }))
+    }
+
     // 存在昵称 群聊
     client.write(JSON.stringify({
       type:types.broadcast,
+      from:nickname,
       msg
     }))
 
@@ -54,9 +68,15 @@ client.on('data', data => {
       break;
     case types.broadcast:
       console.log(`${username} 说: ${msg}`);
-      
       break;
     case types.p2p:
+      if(!success){
+        return console.log(`发送失败：${msg}`);
+      }
+      console.log(`${username}悄悄对你说：${msg}`);
+      break;
+    case types.log:
+      console.log(msg);
       break;
     default:
       break;

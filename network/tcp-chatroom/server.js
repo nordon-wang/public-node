@@ -11,7 +11,9 @@ server.on('connection', clientSocket => {
     const {
       type = null,
       nickname = '',
-      msg = ''
+      msg = '',
+      to = '',
+      from = ''
     } = JSON.parse(data.toString().trim())
 
     switch (type) {
@@ -38,6 +40,16 @@ server.on('connection', clientSocket => {
           sumUsers:users.length,
           username: nickname
         }))
+        
+        // 有人登陆成功 通知其他人
+        users.forEach(socket => {
+          if(socket !== clientSocket){
+            socket.write(JSON.stringify({
+              type:types.log,
+              msg:`${nickname} 进入了聊天室, 当前在线用户:${users.length}`
+            }))
+          }
+        })
 
         break;
       case types.broadcast: // 广播
@@ -46,26 +58,53 @@ server.on('connection', clientSocket => {
           if(socket !== clientSocket){
             socket.write(JSON.stringify({
               type:types.broadcast,
-              username: socket.username,
+              username: from,
               msg
             }))
           }
         })
         break;
       case types.p2p: // 点对点
-        
+        const user = users.find(item => item.username === to)
+        if(!user){
+          return clientSocket.write(JSON.stringify({
+            type:types.p2p,
+            success:false,
+            msg:'用户不存在或者已经下线'
+          }))
+        }
+
+        user.write(JSON.stringify({
+          type:types.p2p,
+          success:true,
+          username:from,
+          msg
+        }))
         break;
       default:
         break;
-    }
-    
+    } 
+  })
 
-    
+  // 监听用户离开, 将其移除
+  clientSocket.on('end', () => {
+    const index = users.findIndex(user => user.username === clientSocket.username)
+
+    if(index !== -1){
+      users.splice(index, 1)
+      // 有人离开 通知其他人
+      users.forEach(socket => {
+        socket.write(JSON.stringify({
+          type:types.log,
+          msg:`${clientSocket.username} 离开聊天室, 当前剩余用户:${users.length}`
+        }))
+      })
+    }
+
   })
 })
 
 
 server.listen(9090, () => {
   console.log('server start 9090');
-  
 })
