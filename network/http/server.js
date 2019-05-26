@@ -21,11 +21,14 @@ const server = http.createServer((req, res) => {
   }else if(url.startsWith('/assets')){
     fs.readFile(`.${url}`, (err, data) => {
       if(err){
-        throw err
+        res.statusCode = 404
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.end('404')
       }else{
-        mime.getType(path.extname(url))
+        const contentType = mime.getType(path.extname(url))
+        
         res.statusCode = 200
-        res.setHeader('Content-Type', 'text/css; charset=utf-8')
+        res.setHeader('Content-Type', contentType)
         res.end(data)
       }
     })
