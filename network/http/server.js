@@ -1,5 +1,7 @@
 const http = require('http')
 const fs = require('fs')
+const mime = require('mime')
+const path = require('path')
 
 const hostname = '127.0.0.1'
 const port = 9999
@@ -21,6 +23,7 @@ const server = http.createServer((req, res) => {
       if(err){
         throw err
       }else{
+        mime.getType(path.extname(url))
         res.statusCode = 200
         res.setHeader('Content-Type', 'text/css; charset=utf-8')
         res.end(data)
