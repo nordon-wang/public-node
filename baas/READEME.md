@@ -156,7 +156,7 @@ const resolvers = {
 - 查询和变更类型
 
 ```
-内置类型中有两个特殊的类型：Query 和 Mutation
+内置类型中有两个特殊的类型：Query(主要用于查询操作) 和 Mutation(主要用于变更操作 -- 增、删、改 )
 
 每一个GraphQL 服务有一个 Query 类型、也可能有一个 mutation 类型、这两个类型本质上也是对象类型、唯一的区别就是他们作为客户端访问的入口
 ```
@@ -166,9 +166,129 @@ const resolvers = {
   - Float
   - String
   - Booleab
-  - ID 唯一标识符
-
+  - ID 唯一标识符，随机生成一个字符串、不需要能认识
 - 枚举类型 — 是一种特殊的标量、枚举类型限制在一个特殊的可选值集合内
+
+```
+enmu Fovour {
+	SWIMING
+	GODING
+	SINGING
+}
+```
+
+> 上述定义表示只能获取三种值之一、获取其他类型的值是不可以的
+
+- 列表和非空
+  - [] 表示列表
+  - ！叹号表示非空
+
+```
+type Student{
+	name: String!
+	scores:[Score]!
+}
+```
+
+> myField:[String!] 表示数组本身可以为空、但是其不能有任何空值成员
+>
+> myField:[String]! 表示数组本身不可以为空、但是其可以包含空值成员
+
+### 3.3.4 输入类型
+
+> 参数也可以是复杂类型、主要用于变更 mutation 场景 — 需要客户端传递输入类型
+
+```
+  # 输入类型
+  input UserInfo{
+    name: String
+    pwd: String
+  }
+
+  #用户类型
+  type User {
+    id: ID
+    name: String
+    pwd: String
+  }
+```
+
+> 定义 mutation、可以用于接收客户端传递的input类型数据
+
+```
+# 变更类型
+type Mutation{
+	addUserByInput(userInput: UserInfo): User
+}
+```
+
+```
+# 处理客户端传递的input参数
+const resolvers = {
+  Query: {
+    hello: () => 'Hello world!'
+  },
+  Mutation: {
+    addUserByInput: (obj, args) => {
+      return {
+        id: uuid(),
+        name: args.userInput.name,
+        pwd: args.userInput.pwd
+      }
+    }
+  }
+};
+```
+
+```
+# 客户端查询操作
+mutation {
+	addUserByInput(userInput: {
+		name: 'nordon',
+		pwd: '123123'
+	}){
+		id
+		name
+	}
+}
+```
+
+![WX20190528-231405@2x](/Users/nordon.wang/Desktop/self/public-node/baas/img-md/WX20190528-231405@2x.png)
+
+- 注意事项
+  - input 类型主要用于变更操作的数据传递
+
+## 3.3 数据解析规则详解
+
+###3.3.1 resolver 函数参数用法
+
+> resolvers 用于给类型字段提供实际数据
+
+- resolver 函数参数
+  - parent 上一级对象、如果字段属于根节点查询类型通常不会被使用
+  - `args` 可以提供在 GrapgQL 查询中传入的参数
+  - `context` 会被提供给所有解析器、并且持有重要的上下文信息。比如当前登入的用户、数据库访问对象
+  - `info` 一个保存与当前查询相关的字段特定信息以及 schema 详细信息的值
+
+```
+  Mutation: {
+    addUserByInput: (parent, args, context, info) => {
+      // parent 当前字段的父级对象 -- Query 中的 hello 相当于根节点，例如查学生中的 name、age 就是子节点
+      // args 客户端传递过来的参数
+      // context 可以用于操作数据源
+      // info 不怎么用
+      return {
+        id: uuid(),
+        name: args.userInput.name,
+        pwd: args.userInput.pwd
+      }
+    }
+  }
+```
+
+
+
+
 
 
 

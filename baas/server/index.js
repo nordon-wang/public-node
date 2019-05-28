@@ -1,27 +1,54 @@
 // 1. 导入相关的依赖包
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
+const uuid = require('uuid')
 
 // 2. 定义数据类型
 // Query 类型是默认客户端查询的类型、并且该类型在服务端必须存在并且是唯一的
 const typeDefs = gql`
-  # 课程类型
-  type Course {
-    cname: String
-    score: Float
+  # 枚举
+  enum Favour {
+    SWIMMING
+    SINGING
+    CODING
   }
 
-  # 学生类型
+  # 课程
+  type Course {
+    cName:String
+    cScore: Int
+  }
+
+  # 列表
   type Student{
+    name: String!
+    age:Int
+    scores:[Course!]!
+  }
+
+  # 输入类型
+  input UserInfo{
     name: String
-    age: Int
-    scores:[Course]
+    pwd: String
+  }
+
+  #用户类型
+  type User {
+    id: ID
+    name: String
+    pwd: String
+  }
+
+  # 变更类型
+  type Mutation{
+    addUserByInput(userInput: UserInfo): User
   }
 
   # 查询类型
   type Query {
     hello: String
-    stu(n: Int = 18): Student
+    info: Favour
+    stu:Student
   }
 
 `;
@@ -30,33 +57,37 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => 'Hello world!',
-    stu: (obj, args) => { // 提供学生相关的数据
-      console.log('-----',args);
-      
-      const courseData = [{
-        cname:"数学",
-        score:66
-      },{
-        cname:'语文',
-        score:88
-      }]
-
-      if(args.n > 10){
-        return {
-          name:'nordon',
-          age:args.n,
-          scores:courseData
-        }
-      }else{
-        return {
-          name:'nordon',
-          age:8,
-          scores:courseData
-        }
+    info: () => {
+      return 'CODING'
+    },
+    stu: () => {
+      return {
+        name:'nordon',
+        // name:null, 不能为空
+        age:18,
+        scores:[{
+          cName:'数学',
+          cScore:99
+        },{
+          cName:'语文',
+          cScore:88
+        }]
       }
-
-    }
+    },
   },
+  Mutation: {
+    addUserByInput: (parent, args, context, info) => {
+      // parent 当前字段的父级对象 -- Query 中的 hello 相当于根节点，例如查学生中的 name、age 就是子节点
+      // args 客户端传递过来的参数
+      // context 可以用于操作数据源
+      // info 不怎么用
+      return {
+        id: uuid(),
+        name: args.userInput.name,
+        pwd: args.userInput.pwd
+      }
+    }
+  }
 };
 
 // 4. 整合 apolloServer 和 express
