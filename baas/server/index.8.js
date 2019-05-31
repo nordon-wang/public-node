@@ -6,53 +6,61 @@ const uuid = require('uuid')
 // 2. 定义数据类型
 // Query 类型是默认客户端查询的类型、并且该类型在服务端必须存在并且是唯一的
 const typeDefs = gql`
-  #输入类型
-  input UserInfo {
-    uname: String
-    pwd: String
+  # 课程类型
+  type Course {
+    cname: String
+    score: Float
   }
 
-  # 用户类型
-  type User {
+  # 学生类型
+  type Student {
     id: ID
-    uname: String
-    pwd: String
-  }
-
-  # 变更类型
-  type Mutation {
-    addUserByParams(uname: String, pwd: String): User
-    addUserByInput(userInput: UserInfo): User
+    sname: String
+    age: Int
+    scores(num: Float): [Course]
   }
 
   # 查询类型
   type Query {
-    hello: String
+    stu(id: Int): Student
   }
 
 `;
 
 // 3. 解析数据类型对应的具体数据
 const resolvers = {
-  Query: {
-    hello: () => 'Hello world!'
+  Student: {
+    scores: (parent, args) => {
+      return parent.scores && parent.scores.filter(item => item.score > args.num)
+    }
   },
-  Mutation: {
-    addUserByParams: (parent, args) => {
-      return {
-        id: uuid(),
-        uname: args.uname,
-        pwd: args.pwd
-      }
-    },
-    addUserByInput: (parent, args) => {
-      return {
-        id: uuid(),
-        uname: args.userInput.uname,
-        pwd: args.userInput.pwd
+  Query: {
+    stu: (parent, args) => {
+      if(args.id === 1){
+        return {
+          id: uuid(),
+          sname: 'nordon',
+          age:18,
+          scores: [{
+            cname: '数学',
+            score: 66
+          },{
+            cname: '英语',
+            score: 55
+          },{
+            cname: '语文',
+            score: 77
+          }]
+        }
+      }else{
+        return {
+          id:0,
+          sname: 'null',
+          scores: null
+        }
       }
     }
-  }
+  },
 };
 
 // 4. 整合 apolloServer 和 express

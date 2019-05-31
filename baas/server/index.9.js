@@ -4,12 +4,17 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const uuid = require('uuid')
 
 // 2. 定义数据类型
-// Query 类型是默认客户端查询的类型、并且该类型在服务端必须存在并且是唯一的
 const typeDefs = gql`
+  # 学生类型
+  type Student {
+    id: ID
+    name: String
+    gender: Boolean
+  }
 
   # 查询类型
   type Query {
-    hello: String
+    stu(id: Int): Student
   }
 
 `;
@@ -17,7 +22,21 @@ const typeDefs = gql`
 // 3. 解析数据类型对应的具体数据
 const resolvers = {
   Query: {
-    hello: () => 'Hello world!'
+    stu: (parent, args) => {
+      if(args.id === 1){
+        return {
+          id: uuid(),
+          name: 'nordon',
+          gender: true
+        }
+      }else{
+        return {
+          id: uuid(),
+          name: 'wangyao',
+          gender: false
+        }
+      }
+    }
   },
 };
 

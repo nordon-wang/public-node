@@ -1,33 +1,26 @@
 // 1. 导入相关的依赖包
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
-const uuid = require('uuid')
+const db = require('./db')
 
 // 2. 定义数据类型
 // Query 类型是默认客户端查询的类型、并且该类型在服务端必须存在并且是唯一的
 const typeDefs = gql`
-  #输入类型
-  input UserInfo {
-    uname: String
-    pwd: String
+  # 学生
+  type Student {
+    name: String
+    age: Int
   }
-
-  # 用户类型
-  type User {
-    id: ID
-    uname: String
-    pwd: String
-  }
-
-  # 变更类型
-  type Mutation {
-    addUserByParams(uname: String, pwd: String): User
-    addUserByInput(userInput: UserInfo): User
+  
+  type Hero {
+    name: String
+    age: Int
   }
 
   # 查询类型
   type Query {
-    hello: String
+    hello: [Student!]!,
+    hero: Hero
   }
 
 `;
@@ -35,29 +28,28 @@ const typeDefs = gql`
 // 3. 解析数据类型对应的具体数据
 const resolvers = {
   Query: {
-    hello: () => 'Hello world!'
-  },
-  Mutation: {
-    addUserByParams: (parent, args) => {
-      return {
-        id: uuid(),
-        uname: args.uname,
-        pwd: args.pwd
-      }
+    hello: async (parent, args, context, info) => {
+      const ret = await context.db.getData()
+      return JSON.parse(ret)
     },
-    addUserByInput: (parent, args) => {
+    hero: () => {
       return {
-        id: uuid(),
-        uname: args.userInput.uname,
-        pwd: args.userInput.pwd
+        name: 'nordon',
+        age: 18
       }
     }
-  }
+  },
 };
+
+const context = ({req}) => {
+  return {
+    db: db
+  }
+}
 
 // 4. 整合 apolloServer 和 express
 // typeDefs, resolvers 两个属性名称是固定的、 属性值可以改变
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers, context });
 
 const app = express();
 server.applyMiddleware({ app });
