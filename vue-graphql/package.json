@@ -13,7 +13,7 @@
     "dayjs": "^1.8.14",
     "element-ui": "^2.9.1",
     "graphql": "^14.3.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "vue": "^2.6.10",
     "vue-apollo": "^3.0.0-beta.30"
   },
